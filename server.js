@@ -13,11 +13,13 @@ const { animals } = require('./data/animals');
 
 // route created that front-end can request data from
 app.get('/api/animals', (req, res) => {
-    res.send('Hello!');
+    res.json(animals);
 });
 // the get() method requires two arguments:
 // 1st is a string that describes the route the client will have to fetch from && 2nd is a callback function that will execute every time that route is accessed with a GET request
-// we are using the send() method from the res parameter (short for response) to send the string Hello! to our client
+// changed from send to json --> so that the client knows it's receiving json (this changes the headers) --> and to send json data
+
+
 
 // Now we just need to use one method to make our server listen
 // We're going to chain the listen() method onto our server to do it
