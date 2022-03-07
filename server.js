@@ -1,6 +1,7 @@
 // main file that our server will run from
 // https://git.heroku.com/tranquil-hamlet-03887.git
 // app: https://tranquil-hamlet-03887.herokuapp.com/
+// add to the end of the app: api/animals
 
 // use require just like for any other npm package
 // this is the use the Express.js npm package
@@ -60,6 +61,15 @@ function filterByQuery(query, animalsArray) {
     return filteredResults;
 }
 
+
+// takes in the id and array of animals and returns a single animal object
+function findById(id, animalsArray) {
+    // the [0] means to get the first element of that array (should be the only element bc id is unique)
+    const result = animalsArray.filter(animal => animal.id === id)[0];
+    return result;
+}
+
+
 // route created that front-end can request data from
 app.get('/api/animals', (req, res) => {
 
@@ -77,6 +87,24 @@ app.get('/api/animals', (req, res) => {
 // changed from send to json --> so that the client knows it's receiving json (this changes the headers) --> and to send json data
 // res = response --> has json() method
 // req = request --> has query property --> it gets all the query parameters after ? and turns it into JSON
+
+
+// param route needs to be added AFTER the initial GET route
+// route to get only 1 animal based on a parameter, here it is id
+app.get('/api/animals/:id', (req, res) => {
+
+    // findById method will for sure only return a single animal bc the id is unique
+    const result = findById(req.params.id, animals);
+
+    // if no record exists for the animal being searched for, the client receives a 404 error
+    if (result) {
+        res.json(result);
+    } else {
+        // send the 404 error code to the client
+        res.send(404);
+        // We chose to return an error here instead of an empty object or undefined in order to make it clear to the client that the resource they asked for, in this case a specific animal, does not exist.
+    }
+});
 
 
 // Now we just need to use one method to make our server listen
