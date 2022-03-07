@@ -1,8 +1,14 @@
 // main file that our server will run from
+// https://git.heroku.com/tranquil-hamlet-03887.git
+// app: https://tranquil-hamlet-03887.herokuapp.com/
 
 // use require just like for any other npm package
 // this is the use the Express.js npm package
 const express = require('express');
+
+// When Heroku runs our app, it sets an environment variable called process.env.PORT
+// We're going to tell our app to use that port, if it has been set, and if not, default to port 80
+const PORT = process.env.PORT || 3001;
 
 // the express() function is a top-level function exported by the express module
 // We assign express() to the app variable so that we can later chain on methods to the Express.js server.
@@ -75,6 +81,8 @@ app.get('/api/animals', (req, res) => {
 
 // Now we just need to use one method to make our server listen
 // We're going to chain the listen() method onto our server to do it
-app.listen(3001, () => {
+// changed 3001 to 80 bc Heroku apps get served using port 80
+// changed from 80 to environment variable
+app.listen(PORT, () => {
     console.log(`API server now on port 3001!`);
 });
