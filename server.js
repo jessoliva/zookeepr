@@ -13,7 +13,7 @@ const path = require('path');
 const express = require('express');
 
 // When Heroku runs our app, it sets an environment variable called process.env.PORT
-// We're going to tell our app to use that port, if it has been set, and if not, default to port 80
+// We're going to tell our app to use that port, if it has been set, and if not, default to port 3001
 const PORT = process.env.PORT || 3001;
 
 // the express() function is a top-level function exported by the express module
@@ -30,6 +30,10 @@ app.use(express.urlencoded({ extended: true }));
 // parse incoming JSON data
 app.use(express.json());
 // takes incoming POST data in the form of JSON and parses it into the req.body JavaScript object
+
+// to display css and javascript files rather than setting up routes for each file
+// used the express.static(<directory-name>) method. The way it works is that we provide a file path to a location in our application (in this case, the public folder) and instruct the server to make these files static resources. This means that all of our front-end code can now be accessed without having a specific server endpoint created for it!
+app.use(express.static('public'));
 
 // require the data for route
 const { animals } = require('./data/animals');
@@ -135,6 +139,7 @@ function createNewAnimal(body, animalsArray) {
 // handles request to view all animals
 app.get('/api/animals', (req, res) => {
 
+    // the animals declared above
     let results = animals;
 
     // if there is a query parameter, then filter by it
@@ -196,15 +201,46 @@ app.post('/api/animals', (req, res) => {
         const animal = createNewAnimal(req.body, animals);
         res.json(animal);
     }
-
-    res.json(animal);
 });
 
+
+// '/' route points us to the root route of the server, this is the route used to create a homepage for a server
+// Unlike most GET and POST routes that deal with creating or return JSON data, this GET route has just one job to do, and that is to respond with an HTML page to display in the browser
+// So instead of using res.json(), we're using res.sendFile(), & all we have to do is tell them where to find the file we want our server to read and send back to the client
+// Notice in the res.sendFile() that we're using the path module again to ensure that we're finding the correct location for the HTML code we want to display in the browser. This way, we know it will work in any server environment!
+// __dirname = directory name of whichever directory this project is in
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, './public/index.html'));
+});
+// so basically whenever someone visits this site, this root route will send the html page --> 
+// just going to main root http://localhost:3001
+// GET route to serve index.html to the root path of our server
+
+// This route will take us to /animals http://localhost:3001/animals
+// This is the second route we've created so far that doesn't have the term api thrown into it. This is intentional, because when we create routes we need to stay organized and set expectations of what type of data is being transferred at that endpoint
+app.get('/animals', (req, res) => {
+    res.sendFile(path.join(__dirname, './public/animals.html'));
+});
+
+// http://localhost:3001/zookeepers
+// Linking between pages no longer needs .html extensions. It just needs the associated route name
+app.get('/zookeepers', (req, res) => {
+    res.sendFile(path.join(__dirname, './public/zookeepers.html'));
+});
+
+
+// Catch route requests that don't exist
+// The * will act as a wildcard, meaning any route that wasn't previously defined will fall under this request and will receive the homepage as the response
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, './public/index.html'));
+});
+// order of routes matter!! this * one should come last!
 
 // Now we just need to use one method to make our server listen
 // We're going to chain the listen() method onto our server to do it
 // changed 3001 to 80 bc Heroku apps get served using port 80
 // changed from 80 to environment variable
+// We can assume that a route that has the term api in it will deal in transference of JSON data, whereas a more normal-looking endpoint such as /animals should serve an HTML page
 app.listen(PORT, () => {
     console.log(`API server now on port 3001!`);
 });
