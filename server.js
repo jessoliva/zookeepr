@@ -3,6 +3,11 @@
 // app: https://tranquil-hamlet-03887.herokuapp.com/
 // add to the end of the app: api/animals
 
+// to use the filesystem
+const fs = require('fs');
+// This is another module built into the Node.js API that provides utilities for working with file and directory paths. It ultimately makes working with our file system a little more predictable
+const path = require('path');
+
 // use require just like for any other npm package
 // this is the use the Express.js npm package
 const express = require('express');
@@ -88,7 +93,19 @@ function findById(id, animalsArray) {
 function createNewAnimal(body, animalsArray) {
     // body is the req.body sent from POST
     const animal = body;
+    // push the animal to the object declared above
     animalsArray.push(animal);
+
+    // write the animal into the file
+    // Here, we're using the fs.writeFileSync() method, which is the synchronous version of fs.writeFile() and doesn't require a callback function
+    fs.writeFileSync(
+        // use the method path.join() to join the value of __dirname, which represents the directory of the file we execute the code in, with the path to the animals.json file. In this case, the path will be from the root of whatever machine this code runs on to the location of our animals.json file
+        path.join(__dirname, './data/animals.json'),
+
+        // we need to save the JavaScript array data as JSON, so we use JSON.stringify() to convert it. The other two arguments used in the method, null and 2, are means of keeping our data formatted. The null argument means we don't want to edit any of our existing data; if we did, we could pass something in there. The 2 indicates we want to create white space between our values to make it more readable.
+        // If we were to leave those two arguments out, the entire animals.json file would work, but it would be really hard to read.
+        JSON.stringify({ animals: animalsArray }, null, 2)
+    );
   
     return animal;
 }
