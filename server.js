@@ -15,6 +15,17 @@ const PORT = process.env.PORT || 3001;
 // We assign express() to the app variable so that we can later chain on methods to the Express.js server.
 const app = express();
 
+// Both of the below middleware functions need to be set up every time you create a server that's looking to accept POST data
+//
+// parse incoming string or array data
+app.use(express.urlencoded({ extended: true }));
+// a method built into Express.js. It takes incoming POST data and converts it to key/value pairings that can be accessed in the req.body object
+// The 'extended: true' option set inside the method call informs our server that there may be sub-array data nested in it as well, so it needs to look as deep into the POST data as possible to parse all of the data correctly
+//
+// parse incoming JSON data
+app.use(express.json());
+// takes incoming POST data in the form of JSON and parses it into the req.body JavaScript object
+
 // require the data for route
 const { animals } = require('./data/animals');
 
@@ -70,7 +81,22 @@ function findById(id, animalsArray) {
 }
 
 
+// function that accepts the POST route's req.body value and the array we want to add the data to
+// that array will be the animalsArray, because the function is for adding a new animal to the catalog
+// We are going to execute this function from within the app.post() route's callback function and when we do, it'll take the new animal data and add it to the animalsArray we passed in, and then write the new array data to animals.json
+// After saving it, we'll send the data back to the route's callback function so it can finally respond to the request
+function createNewAnimal(body, animalsArray) {
+    // body is the req.body sent from POST
+    const animal = body;
+    animalsArray.push(animal);
+  
+    return animal;
+}
+
+
+// API endpoint
 // route created that front-end can request data from
+// handles request to view all animals
 app.get('/api/animals', (req, res) => {
 
     let results = animals;
@@ -89,8 +115,10 @@ app.get('/api/animals', (req, res) => {
 // req = request --> has query property --> it gets all the query parameters after ? and turns it into JSON
 
 
+// API endpoint
 // param route needs to be added AFTER the initial GET route
 // route to get only 1 animal based on a parameter, here it is id
+// handles request to view a single animal based on id
 app.get('/api/animals/:id', (req, res) => {
 
     // findById method will for sure only return a single animal bc the id is unique
@@ -104,6 +132,23 @@ app.get('/api/animals/:id', (req, res) => {
         res.send(404);
         // We chose to return an error here instead of an empty object or undefined in order to make it clear to the client that the resource they asked for, in this case a specific animal, does not exist.
     }
+});
+
+// a route that listens for POST requests, not GET requests
+// POST requests differ from GET requests in that they represent the action of a client requesting the server to accept data rather than vice versa
+// With POST requests, we can package up data, typically as an object, and send it to the server
+// req.body property is where we can access that data on the server side & do something with it
+app.post('/api/animals', (req, res) => {
+    // set id based on what the next index of the array will be
+    req.body.id = animals.length.toString();
+    // Now when we receive new post data to be added to the animals.json file, we'll take the length property of the animals array (because it's a one-to-one representation of our animals.json file data) and set that as the id for the new data. Remember, the length property is always going to be one number ahead of the last index of the array so we can avoid any duplicate values
+    // red.body now has an id
+
+    // add animal to json file and animals array in this function
+    // animals is the array from line 30
+    const animal = createNewAnimal(req.body, animals);  
+
+    res.json(animal);
 });
 
 
