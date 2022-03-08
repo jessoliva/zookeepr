@@ -86,6 +86,25 @@ function findById(id, animalsArray) {
 }
 
 
+// validate data from post before writing it to the json file
+function validateAnimal(animal) {
+    if (!animal.name || typeof animal.name !== 'string') {
+      return false;
+    }
+    if (!animal.species || typeof animal.species !== 'string') {
+      return false;
+    }
+    if (!animal.diet || typeof animal.diet !== 'string') {
+      return false;
+    }
+    // Array.isArray(value), determines whether the value is an array, returns true if it is, and false otherwise
+    if (!animal.personalityTraits || !Array.isArray(animal.personalityTraits)) {
+      return false;
+    }
+    return true;
+}
+
+
 // function that accepts the POST route's req.body value and the array we want to add the data to
 // that array will be the animalsArray, because the function is for adding a new animal to the catalog
 // We are going to execute this function from within the app.post() route's callback function and when we do, it'll take the new animal data and add it to the animalsArray we passed in, and then write the new array data to animals.json
@@ -161,9 +180,22 @@ app.post('/api/animals', (req, res) => {
     // Now when we receive new post data to be added to the animals.json file, we'll take the length property of the animals array (because it's a one-to-one representation of our animals.json file data) and set that as the id for the new data. Remember, the length property is always going to be one number ahead of the last index of the array so we can avoid any duplicate values
     // red.body now has an id
 
-    // add animal to json file and animals array in this function
-    // animals is the array from line 30
-    const animal = createNewAnimal(req.body, animals);  
+    // before we create the data and add it to the catalog, we'll pass our data through validateAnimal() 
+    // In this case, the animal parameter is going to be the content from req.body, and we're going to run its properties through a series of validation checks. If any of them are false, we will return false and not create the animal data
+    // validate data, send data to the function
+    // if any data in req.body is incorrect (if it is not true), send 400 error back
+    if (!validateAnimal(req.body)) {
+        // a response method to relay a message to the client making the request. We send them an HTTP status code and a message explaining what went wrong
+        // Anything in the 400 range means that it's a user error and not a server error, and the message can help the user understand what went wrong on their end
+        res.status(400).send('The animal is not properly formatted.');
+    } 
+    // if data is correct, and the function returns true then send that data to createNewAnimal
+    else {
+        // add animal to json file and animals array in this function
+        // animals is the array declared above
+        const animal = createNewAnimal(req.body, animals);
+        res.json(animal);
+    }
 
     res.json(animal);
 });
