@@ -1,7 +1,7 @@
 // main file that our server will run from
 // server.js file should be in charge of starting our server
 // https://git.heroku.com/tranquil-hamlet-03887.git
-// app: https://tranquil-hamlet-03887.herokuapp.com/api/animals
+// app: https://tranquil-hamlet-03887.herokuapp.com/
 
 // use require just like for any other npm package
 // this is the use the Express.js npm package
