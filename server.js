@@ -3,15 +3,6 @@
 // https://git.heroku.com/tranquil-hamlet-03887.git
 // app: https://tranquil-hamlet-03887.herokuapp.com/api/animals
 
-// The require() statements will read the index.js files in each of the directories indicated. This mechanism works the same way as directory navigation does in a website: If we navigate to a directory that doesn't have an index.html file, then the contents are displayed in a directory listing. But if there's an index.html file, then it is read and its HTML is displayed instead. Similarly, with require(), the index.js file will be the default file read if no other file is provided, which is the coding method we're using here.
-const apiRoutes = require('./routes/apiRoutes');
-const htmlRoutes = require('./routes/htmlRoutes');
-
-// to use the filesystem
-const fs = require('fs');
-// This is another module built into the Node.js API that provides utilities for working with file and directory paths. It ultimately makes working with our file system a little more predictable
-const path = require('path');
-
 // use require just like for any other npm package
 // this is the use the Express.js npm package
 const express = require('express');
@@ -24,6 +15,9 @@ const PORT = process.env.PORT || 3001;
 // We assign express() to the app variable so that we can later chain on methods to the Express.js server.
 const app = express();
 
+// The require() statements will read the index.js files in each of the directories indicated. This mechanism works the same way as directory navigation does in a website: If we navigate to a directory that doesn't have an index.html file, then the contents are displayed in a directory listing. But if there's an index.html file, then it is read and its HTML is displayed instead. Similarly, with require(), the index.js file will be the default file read if no other file is provided, which is the coding method we're using here.
+const apiRoutes = require('./routes/apiRoutes');
+const htmlRoutes = require('./routes/htmlRoutes');
 
 // Both of the below middleware functions need to be set up every time you create a server that's looking to accept POST data
 //
@@ -48,15 +42,11 @@ app.use('/api', apiRoutes);
 app.use('/', htmlRoutes);
 
 
-// require the data for route
-const { animals } = require('./data/animals');
-
-
 // Now we just need to use one method to make our server listen
 // We're going to chain the listen() method onto our server to do it
 // changed 3001 to 80 bc Heroku apps get served using port 80
 // changed from 80 to environment variable
 // We can assume that a route that has the term api in it will deal in transference of JSON data, whereas a more normal-looking endpoint such as /animals should serve an HTML page
 app.listen(PORT, () => {
-    console.log(`API server now on port 3001!`);
+    console.log(`API server now on port ${PORT}!`);
 });

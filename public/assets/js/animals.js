@@ -79,7 +79,6 @@ const handleGetAnimalsSubmit = event => {
 
   getAnimals(animalObject);
 };
-
 // we call the handleGetAnimalsSubmit() function on form submission, then queryURL is modified based on this
 $animalForm.addEventListener('submit', handleGetAnimalsSubmit);
 

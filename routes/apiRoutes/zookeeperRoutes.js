@@ -37,7 +37,7 @@ router.post('/zookeepers', (req, res) => {
 
     req.body.id = zookeepers.length.toString();
 
-    if (!validateAnimal(req.body)) {
+    if (!validateZookeeper(req.body)) {
         res.status(400).send('The zookeeper is not properly formatted.');
     } 
     else {

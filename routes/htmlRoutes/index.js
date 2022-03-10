@@ -1,3 +1,4 @@
+// This is another module built into the Node.js API that provides utilities for working with file and directory paths. It ultimately makes working with our file system a little more predictable
 const path = require('path');
 const router = require('express').Router();
 
@@ -34,6 +35,7 @@ router.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, '../../public/index.html'));
 });
 // order of routes matter!! this * one should come last!
+
 
 // export the router
 module.exports = router;
